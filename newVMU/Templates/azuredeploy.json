@@ -1,12 +1,272 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "vm name"
+      }
     },
-    "variables": {
+    "AdminUserName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Admin username"
+      }
     },
-    "resources": [
-    ],
-    "outputs": {
+    "AdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_A0",
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_A5",
+        "Standard_A6"
+      ],
+      "metadata": {
+        "description": "Vm size"
+      }
+    },
+    "StorageAccName": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name"
+      }
+    },
+    "SAType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS"
+      ],
+      "metadata": {
+        "description": "Storage Account Type"
+      }
+    },
+    "IPAddDnsName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "IP Address DNS name"
+      }
+    },
+    "customImageLink": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide uri of the custom image"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Name"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet name"
+      }
+    },
+    "subnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24",
+      "allowedValues": [
+        "10.0.0.0/24",
+        "10.0.0.0/32"
+      ]
     }
+
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "containerName": "myContainer",
+    "OSDiskName": "vmOSDisk",
+    "NICName": "[concat(parameters('vmName'), 'NetworkInterface')]",
+    "dnsName": "[parameters('IPAddDnsName')]",
+    "IPAddName": "IPAdd",
+    "IPAddType": "Dynamic",
+    "vnetPrefix": "10.0.0.0/16",
+    "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+    "vmSubnetRef": "[concat(variables('vmVnetID'), '/subnets/', parameters('subnetName'))]",
+    "templateLink": "https://raw.githubusercontent.com/deepika-chouhan/RHEL1/master/AzureResourceGroup6/Templates/"
+
+
+  },
+  "resources": [
+    //Storage Account Deployment
+    {
+      "name": "linkedTempateSA",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateLink'),'sadeployeploy.json')]",
+          "contentVersoin": "1.0.0.0"
+        },
+        "parameters": {
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "SAType": {
+            "value": "[parameters('SAType')]"
+          },
+          "StorageAccName": {
+            "value": "[parameters('StorageAccName')]"
+          }
+        }
+      }
+    },
+
+    //Virtual network Deployment
+    {
+      "name": "linkedTemplateVnet",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "mode": "Incremental",
+        "TemplateLink": {
+          "uri": "[concat(variables('templateLink'),'vndeploy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "vnetPrefix": {
+            "value": "[variables('vnetPrefix')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "subnetPrefix": {
+            "value": "[parameters('subnetPrefix')]"
+          },
+          "vnetName": {
+            "value": "[parameters('vnetName')]"
+          }
+        }
+      }
+    },
+
+
+
+    //Public IP Address Deploy
+    {
+      "name": "linkedTemplatePIP",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateLink'),'padeploy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "IPAddName": {
+            "value": "[variables('IPAddName')]"
+          },
+          "IPAddType": {
+            "value": "[variables('IPAddType')]"
+          },
+          "IPAddDnsName": {
+            "value": "[parameters('IPAddDnsName')]"
+          }
+        }
+      }
+    },
+
+    //NIC Deployment
+    {
+      "name": "linkedTemplateNIC",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateLink'),'nideploy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmSubnetRef": {
+            "value": "[variables('vmSubnetRef')]"
+          },
+          "NICName": {
+            "value": "[variables('NICName')]"
+          },
+          "vnetName": {
+            "value": "[parameters('vnetName')]"
+          },
+          "IPAddName": {
+            "value": "[variables('IPAddName')]"
+          },
+          "location": {
+            "value": "[variables('location')]"
+          }
+        }
+      }
+    },
+
+    //Virtual Machine Deployment
+    {
+      "name": "linkedTemplateVM",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateLink'),'vmdeploy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "StorageAccName": {
+            "value": "[parameters('StorageAccName')]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "AdminUsername": {
+            "value": "[parameters('AdminUsername')]"
+          },
+          "AdminPassword": {
+            "value": "[parameters('AdminPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "NICName": {
+            "value": "[variables('NICName')]"
+          },
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "containerName": {
+            "value": "[variables('containerName')]"
+          },
+          "osDiskName": {
+            "value": "[variables('oSDiskName')]"
+          },
+          "customImageLink": {
+            "value": "[parameters('customImageLink')]"
+          }
+        }
+      }
+    }
+  ]
 }

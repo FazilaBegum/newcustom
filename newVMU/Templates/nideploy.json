@@ -1,0 +1,46 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "NICName": {
+      "type": "string"
+    },
+    "IPAddName": {
+      "type": "string"
+    },
+    "vnetName": {
+      "type": "string"
+    },
+    "vmSubnetRef": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "name": "[parameters('NICName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('IPAddName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAdd": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('IPAddName'))]"
+              },
+              "subnet": {
+                "id": "[parameters('vmSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

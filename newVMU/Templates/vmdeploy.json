@@ -1,0 +1,75 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string"
+    },
+    "storageAccName": {
+      "type": "string"
+    },
+    "NICName": {
+      "type": "string"
+    },
+    "vmSize": {
+      "type": "string"
+    },
+    "AdminUsername": {
+      "type": "string"
+    },
+    "AdminPassword": {
+      "type": "securestring"
+    },
+    "customImageLink": {
+      "type": "string"
+    },
+    "osDiskName": {
+      "type": "string"
+    },
+    "containerName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "name": "[parameters('vmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts', parameters('storageAccName'))]",
+        "[concat('Microsoft.Network/networkInterfaces', parameters('NICName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "image": {
+            "uri": "[parameters('customImageLink')]"
+          },
+          "osDisk": {
+            "name": "[parameters('osDiskName')]",
+            "vhd": {
+              "uri": "[concat('https://', parameters('StorageAccName'), '.blob.core.windows.net/', parameters('containerName'), '/', parameters('OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('NICName'))]"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

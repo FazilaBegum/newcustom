@@ -1,6 +1,30 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AdminUserName": {
+      "value": "fazilanew"
+    },
+    "AdminPassword": {
+      "value": "fazijoA@12"
+    },
+    "vmName": {
+      "value": "Fazilaubuntu"
+    },
+    "IPAddDnsName": {
+      "value": "thedns"
+    },
+    "customImageLink": {
+      "value": "https://uofuzmtvul3cusalinuxvm.blob.core.windows.net/system/Microsoft.Compute/Images/vhds/temp.vhd-osDisk.3d2b460d-6582-46a0-9f74-1bc9dfcd0880.vhd"
+    },
+    "vnetName": {
+      "value": "myvnet"
+    },
+    "subnetName": {
+      "value": "mysubnet"
+    },
+    "StorageAccName": {
+      "value": "myStorageAccount"
     }
+  }
 }
