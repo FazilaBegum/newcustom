@@ -101,26 +101,23 @@
     "vnetPrefix": "10.0.0.0/16",
     "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
     "vmSubnetRef": "[concat(variables('vmVnetID'), '/subnets/', parameters('subnetName'))]",
-    "templateLink": "https://raw.githubusercontent.com/deepika-chouhan/RHEL1/master/AzureResourceGroup6/Templates/"
+    "templateLink": "https://raw.githubusercontent.com/FazilaBegum/newcustom/master/newVMU/Templates/"
 
 
   },
   "resources": [
-    //Storage Account Deployment
     {
-      "name": "linkedTempateSA",
+      "name": "linkedTemplateSA",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('templateLink'),'sadeployeploy.json')]",
+          "uri": "[concat(variables('templateLink'),'sadeploy.json')]",
           "contentVersoin": "1.0.0.0"
         },
         "parameters": {
-          "location": {
-            "value": "[variables('location')]"
-          },
+
           "SAType": {
             "value": "[parameters('SAType')]"
           },
@@ -131,11 +128,10 @@
       }
     },
 
-    //Virtual network Deployment
     {
       "name": "linkedTemplateVnet",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
         "TemplateLink": {
@@ -143,9 +139,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "location": {
-            "value": "[variables('location')]"
-          },
           "vnetPrefix": {
             "value": "[variables('vnetPrefix')]"
           },
@@ -164,11 +157,11 @@
 
 
 
-    //Public IP Address Deploy
+
     {
       "name": "linkedTemplatePIP",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -176,15 +169,10 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "location": {
-            "value": "[variables('location')]"
-          },
           "IPAddName": {
             "value": "[variables('IPAddName')]"
           },
-          "IPAddType": {
-            "value": "[variables('IPAddType')]"
-          },
+
           "IPAddDnsName": {
             "value": "[parameters('IPAddDnsName')]"
           }
@@ -192,11 +180,11 @@
       }
     },
 
-    //NIC Deployment
+
     {
       "name": "linkedTemplateNIC",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -215,19 +203,17 @@
           },
           "IPAddName": {
             "value": "[variables('IPAddName')]"
-          },
-          "location": {
-            "value": "[variables('location')]"
           }
+
         }
       }
     },
 
-    //Virtual Machine Deployment
+    
     {
       "name": "linkedTemplateVM",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -253,9 +239,7 @@
           "NICName": {
             "value": "[variables('NICName')]"
           },
-          "location": {
-            "value": "[variables('location')]"
-          },
+          
           "containerName": {
             "value": "[variables('containerName')]"
           },
