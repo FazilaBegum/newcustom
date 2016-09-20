@@ -37,8 +37,8 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts', parameters('storageAccName'))]",
-        "[concat('Microsoft.Network/networkInterfaces', parameters('NICName'))]"
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', parameters('NICName'))]"
       ],
       "properties": {
         "hardwareProfile": {
